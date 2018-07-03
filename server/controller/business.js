@@ -1,4 +1,4 @@
-import Controller from '../lib/Controller'
+import Controller from '../lib/rest/Controller'
 
 export default new Controller(`business`,{
     async one(ctx,{id}) {
@@ -10,10 +10,6 @@ export default new Controller(`business`,{
     async update(ctx) {},
     async insert(ctx) {},
     async delete(ctx) {}
-}).before(async (ctx) => {
-    console.log('action before')
-}).after(async (ctx) => {
-    console.log('action after')
 }).on('error',(error) => {
     console.log('controller error',error)
 })

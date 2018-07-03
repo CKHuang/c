@@ -1,4 +1,10 @@
 import EventEmitter from 'events'
+
+const ERROR_TYPE = {
+    'UNKONW': 'unkonw',
+    'VERIFY': 'verify',
+    'ACTION': 'action'
+}
 /**
  * Controller基础类，controller都需要继承它来实现
  * @param {string} name 控制器名称
@@ -6,7 +12,8 @@ import EventEmitter from 'events'
  * @api {function} before action之前的行为自定义
  * @api {function} after action之后的行为自定义
  * @api {function} actions 返回所有注册的action
- * @api {function} on('name',fun) 监听事件，拥有的事件error
+ * @event [error] (error)
+ *     @param {object} error 错误信息{type,error},type的类型verify数据校验错误,action执行action错误,unknow未知错误
  * @example
  *   const controller = new Controller('user',{
  *      one(ctx){},
@@ -32,12 +39,18 @@ class Controller extends EventEmitter {
                     await this._before()
                     await this._srcActions[i].call(this,...args)
                     await this._after()
-                } catch (e) {
-                    this.emit('error',e)
+                } catch (error) {
+                    this._handlerError(ERROR_TYPE.ACTION,error)
                 }
             }
         }
         return acts;
+    }
+    _handlerError(type = ERROR_TYPE.UNKONW,error) {
+        this.emit('error',{
+            type: type,
+            error: error
+        })
     }
     before(fun) {
         this._before = fun
