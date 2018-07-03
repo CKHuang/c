@@ -1,71 +1,111 @@
 import EventEmitter from 'events'
+import logger from '../logger'
 
-const ERROR_TYPE = {
-    'UNKONW': 'unkonw',
-    'VERIFY': 'verify',
-    'ACTION': 'action'
-}
 /**
- * Controller基础类，controller都需要继承它来实现
- * @param {string} name 控制器名称
- * @param {object} actions 需要注册进来的action对象
- * @api {function} before action之前的行为自定义
- * @api {function} after action之后的行为自定义
- * @api {function} actions 返回所有注册的action
- * @event [error] (error)
- *     @param {object} error 错误信息{type,error},type的类型verify数据校验错误,action执行action错误,unknow未知错误
- * @example
- *   const controller = new Controller('user',{
- *      one(ctx){},
- *      query(ctx){},
- *      update(ctx){}
- *   })
+ * controller执行可能会出现的异常类型
+ * @var {object}
  */
-class Controller extends EventEmitter {
+const EXCEPTION = {
+    'UNKNOW': 0,
+    'ACTION': 1,
+    'VERIFY': 2
+}
+
+/**
+ * RESTful类型api的基础Controller基类
+ * @api before(fun) 行为执行之前
+ *    @param {function} fun 函数
+ * @api after(fun) 行为执行之后
+ *    @param {function} fun 函数
+ * @api actions() 返回所有注册的行为
+ *    @return {object}
+ */
+export default class Controller extends EventEmitter {
+    /**
+     * 构造函数
+     * @param {string} name 业务名称 
+     * @param {object} actions 行为对象
+     */
     constructor(name,actions) {
         super()
-        this._name = name
-        this._srcActions = actions;
-        this._actions = this._wrapActions(actions)
-        this._before = function(){}
-        this._after = function(){}
-        this._verify = {}
-    }
-    _wrapActions(actions) {
-        const acts = {}
-        for( let i in actions ) {
-            acts[i] = async (...args) => {
-                try {
-                    await this._before()
-                    await this._srcActions[i].call(this,...args)
-                    await this._after()
-                } catch (error) {
-                    this._handlerError(ERROR_TYPE.ACTION,error)
-                }
-            }
-        }
-        return acts;
-    }
-    _handlerError(type = ERROR_TYPE.UNKONW,error) {
-        this.emit('error',{
-            type: type,
-            error: error
-        })
+        this.name = name;
+        this.acts = this.decorator(actions)
+        this.verifs = {};
+        this.afterAction = () => {}
+        this.beforeAction = () => {}
     }
     before(fun) {
-        this._before = fun
+        this.beforeAction = fun;
         return this;
     }
     after(fun) {
-        this._after = fun
+        this.afterAction = fun;
         return this;
     }
-    actions() {
-        return this._actions;
+    /**
+     * 返回所有注册的actions
+     * @return {object}
+     */
+    actions(){
+        return this.acts;
     }
-    verify() {
-        return this
+    /**
+     * 参数校验
+     * @param {object} funs 检测的函数对象，对应到actions里面的keys
+     */
+    verify(funs) {
+        const keys = Object.keys(this.actions());
+        keys.forEach((key) => {
+            if (typeof funs[key] !== 'function') {
+                funs[key] = async () => { return Promise.resolve() }
+            }
+        });
+        this.verifs = funs;
+        return this;
+    }
+    /**
+     * 修饰actions
+     * @param {object} actions 行为函数object 
+     */
+    decorator(actions) {
+        for ( let i in actions ) {
+            actions[i] = this.decorate(i,actions[i])
+        }
+        return actions;
+    }
+    /**
+     * 函数修饰
+     * @param {string} name 行为的名称
+     * @param {function} action 行为函数
+     * @return {function} 被修饰后的函数
+     */
+    decorate(i,action) {
+        return async (...args) => {
+            try {
+                const funs = [
+                    this.beforeAction,
+                    async (...args) => {
+                        if (typeof this.verifs[i] == 'function') {
+                            await this.verifs[i].call(this,...args)
+                        }
+                        action.call(this,...args);
+                    },
+                    this.afterAction
+                ]
+                for( let fun of funs ) {
+                    await fun.call(this,...args)
+                }
+            } catch(error) {
+                this.handlerException(EXCEPTION.ACTION,error)
+            }
+        }
+    }
+    /**
+     * 处理异常错误
+     * @param {string} type 异常错误类型 
+     * @param {Error} error 错误对象 
+     */
+    handlerException(type = EXCEPTION.UNKNOW,error) {
+        this.emit('error',{type,error})
     }
 }
-
-export default Controller
