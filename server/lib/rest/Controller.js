@@ -8,7 +8,10 @@ import logger from '../logger'
 const EXCEPTION = {
     'UNKNOW': 0,
     'ACTION': 1,
-    'VERIFY': 2
+    'VERIFY': 2,
+    'INVOKEMODEL': 3,
+    'NOMODEL': 4,
+    'NOMODELINTERFACE': 5
 }
 
 /**
@@ -31,6 +34,7 @@ export default class Controller extends EventEmitter {
         this.name = name;
         this.acts = this.decorator(actions)
         this.verifs = {};
+        this.models = {}
         this.afterAction = () => {}
         this.beforeAction = () => {}
     }
@@ -40,6 +44,51 @@ export default class Controller extends EventEmitter {
     }
     after(fun) {
         this.afterAction = fun;
+        return this;
+    }
+    /**
+     * 在执行model之前wrap一下通过invoke的方式可以捕获到错误以及执行打点
+     * @param {string} name model的名称
+     * @param {string} method 要执行的接口名称
+     * @param {mixed} args 要传进去的参数
+     */
+    async invokeModel(name,method,...args) {
+        try {
+            const model = this.models[name]
+            if ( !model ) {
+                this.handlerException(
+                    EXCEPTION.NOMODEL,
+                    new Error(`controller ${this.name} invoke empty model ${name}`)
+                )
+                return ;
+            }
+            if ( typeof model[method] !== 'function' ) {
+                this.handlerException(
+                    EXCEPTION.NOMODELINTERFACE,
+                    new Error(`model ${name} invoke empty method ${method}`)
+                )
+                return ;
+            }
+            return await model[method].call(model,...args)
+        } catch (error) {
+            this.handlerException(
+                EXCEPTION.INVOKEMODEL,
+                error
+            )
+        }
+    }
+    model(models) {
+        if( typeof models == 'string' ) {
+            if ( !this.models[models] ) {
+                this.handlerException(
+                    EXCEPTION.NOMODEL,
+                    new Error(`${this.name} controller has no model ${models}`)
+                )
+                return ;
+            }
+            return this.models[models]
+        }
+        this.models = models;
         return this;
     }
     /**

@@ -24,12 +24,11 @@ const SQL = {
      * @param {object} updated 
      */
     update(table,primaryKey,primaryKeyValue,updated) {
-        const keys = Object.keys(updated)
+        const fields = Object.keys(updated).map(field => field + '= ?')
         const values = Object.values(updated)
-        values.push(primaryKeyValue)
-        keys.map(key => key + '= ?')
+              values.push(primaryKeyValue)
         return mysql.format(
-            `UPDATE ${table} SET ${keys.join(',')} WHERE ${primaryKey} = ?`,
+            `UPDATE ${table} SET ${fields.join(',')} WHERE ${primaryKey} = ?`,
             values
         )
     }
@@ -40,6 +39,7 @@ const SQL = {
  * @param {object} endpoint {host,password,user,databases}
  */
 const getConnection = (endpoint) => {
+    console.log('endpoint',endpoint)
     return mysql.createPool(endpoint)
 }
 
@@ -71,9 +71,12 @@ export default class Mysql {
      * @param {string} table 表的名称
      * @param {string} primaryKey 主键的名称
      */
-    constructor(table,primaryKey){
+    constructor(endpoint,table,primaryKey){
+        this.endpoint = endpoint
+        this.table = table;
+        this.primaryKey = primaryKey
         this.SQL = SQL
-        this.connection = getConnection(endpoint);
+        this.connection = getConnection(this.endpoint);
         this.formats = null
         return this;
     }
@@ -108,13 +111,10 @@ export default class Mysql {
      */
     async insert(inserted) {
         try {
-            const args = SQL.insert(this.table,inserted)  
-            const res = await this.query.call(
-                this,
-                args.sql,
-                args.data
+            const res = await this.query(
+                SQL.insert(this.table,inserted)
             )
-            console.log('insert res')
+            return res.results.insertId
         } catch(e) {
             throw e;
         }
@@ -127,12 +127,15 @@ export default class Mysql {
      */
     async update(primaryKeyValue,updated) {
         try {
-            const args = SQL.update(this.table,updated)
-            const res = await this.query.call(
-                this,
-                args.sql,
-                args.data
+            const res = await this.query(
+                SQL.update(
+                    this.table,
+                    this.primaryKey,
+                    primaryKeyValue,
+                    updated
+                )
             )
+            return res.results.affectedRows
         } catch(e) {
             throw e;
         }

@@ -1,16 +1,20 @@
 import Controller from '../lib/rest/Controller'
-import businessModel from '../model/business'
+import business from '../model/business'
 
 export default new Controller(`business`,{
     async one(ctx,{id}) {
-        ctx.body = `GET ${zidk} Business`
-        
+        ctx.body = `GET ${id} Business`
         if (id == 'insert') {
-            businessModel.insert({
-                name: 'aps_TEST',
-                key: 'aps_keys',
-                owner: 'ckming'
-            })
+            const rows = await this.invokeModel(
+                'business',
+                'update',
+                3,
+                {
+                    bizKey: 'test_key'
+                }
+            )
+            console.log('rows',rows)
+            
         }
     },
     async query(ctx) {
@@ -19,6 +23,8 @@ export default new Controller(`business`,{
     async update(ctx) {},
     async insert(ctx) {},
     async delete(ctx) {}
+}).model({
+    business: business
 }).verify({
     async one(ctx,{id}) {
         return Promise.resolve('verify error');
