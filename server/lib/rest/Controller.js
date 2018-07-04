@@ -48,46 +48,43 @@ export default class Controller extends EventEmitter {
     }
     /**
      * 在执行model之前wrap一下通过invoke的方式可以捕获到错误以及执行打点
+     * @param {Koa.Context} ctx 请求的上下文
      * @param {string} name model的名称
      * @param {string} method 要执行的接口名称
      * @param {mixed} args 要传进去的参数
      */
-    async invokeModel(name,method,...args) {
+    async invokeModel(ctx,name,method,...args) {
         try {
             const model = this.models[name]
             if ( !model ) {
                 this.handlerException(
                     EXCEPTION.NOMODEL,
-                    new Error(`controller ${this.name} invoke empty model ${name}`)
+                    new Error(`controller ${this.name} invoke empty model ${name}`),
+                    ctx
                 )
                 return ;
             }
             if ( typeof model[method] !== 'function' ) {
                 this.handlerException(
                     EXCEPTION.NOMODELINTERFACE,
-                    new Error(`model ${name} invoke empty method ${method}`)
+                    new Error(`model ${name} invoke empty method ${method}`),
+                    ctx
                 )
                 return ;
             }
-            return await model[method].call(model,...args)
+            const res = await model[method].call(model,...args)
+            logger.trace(`invokeModel ${name}.${method}`,res);
+            return res
         } catch (error) {
+            logger.trace('Controller.invokeModel error',error);
             this.handlerException(
                 EXCEPTION.INVOKEMODEL,
-                error
+                error,
+                ctx
             )
         }
     }
     model(models) {
-        if( typeof models == 'string' ) {
-            if ( !this.models[models] ) {
-                this.handlerException(
-                    EXCEPTION.NOMODEL,
-                    new Error(`${this.name} controller has no model ${models}`)
-                )
-                return ;
-            }
-            return this.models[models]
-        }
         this.models = models;
         return this;
     }
@@ -129,32 +126,33 @@ export default class Controller extends EventEmitter {
      * @return {function} 被修饰后的函数
      */
     decorate(i,action) {
-        return async (...args) => {
+        return async (ctx,...args) => {
             try {
                 const funs = [
                     this.beforeAction,
-                    async (...args) => {
+                    async (ctx,...args) => {
                         if (typeof this.verifs[i] == 'function') {
-                            await this.verifs[i].call(this,...args)
+                            await this.verifs[i].call(this,ctx,...args)
                         }
-                        action.call(this,...args);
+                        action.call(this,ctx,...args);
                     },
                     this.afterAction
                 ]
                 for( let fun of funs ) {
-                    await fun.call(this,...args)
+                    await fun.call(this,ctx,...args)
                 }
             } catch(error) {
-                this.handlerException(EXCEPTION.ACTION,error)
+                this.handlerException(EXCEPTION.ACTION,error,ctx)
             }
         }
     }
     /**
      * 处理异常错误
      * @param {string} type 异常错误类型 
-     * @param {Error} error 错误对象 
+     * @param {Error} error 错误对象
+     * @param {Koa.Cotext} ctx 请求上下文对象
      */
-    handlerException(type = EXCEPTION.UNKNOW,error) {
-        this.emit('error',{type,error})
+    handlerException(type = EXCEPTION.UNKNOW,error,ctx) {
+        this.emit('error',{type,error,ctx})
     }
 }

@@ -13,6 +13,13 @@ const ACTIONS = {
     'DELETE': 5
 }
 
+const toJson = (data = null) => {
+    if (data === null) {
+        return data;
+    }
+    return typeof data == "string" ? JSON.parse(data) : data
+}
+
 /**
  * 对ACTIONS转成都是小写英文字母的数组
  * @type array
@@ -90,7 +97,7 @@ const parameter = {
     update(ctx) {
         return {
             id: ctx.params.id,
-            updated: ctx.request.body.updated || null
+            updated: toJson(ctx.request.body.updated)
         }
     },
     /**
@@ -100,7 +107,7 @@ const parameter = {
      */
     insert(ctx) {
         return {
-            inserted: ctx.request.body.inserted || null
+            inserted: toJson(ctx.request.body.inserted)
         }
     },
      /**

@@ -8,6 +8,15 @@ import logger from '../../logger'
  */
 const SQL = {
     /**
+     * 生成根据primarykey查询某个数据
+     * @param {string} table 表名称
+     * @param {string} primaryKey 主键的名称
+     * @param {number} primaryKeyValue 主键的值
+     */
+    one(table,primaryKey,primaryKeyValue) {
+        return mysql.format(`SELECT * FROM ${table} WHERE ${primaryKey} = ?`,primaryKeyValue)
+    },
+    /**
      * 生成insert语句
      * @param {string} table 表名称
      * @param {object} inserted 要插入表的数据
@@ -51,7 +60,9 @@ const getConnection = (endpoint) => {
  */
 const query = (connection,sql) => {
     return new Promise((resolve,reject) => {
+        logger.trace('Mysql.query',sql);
         connection.query(sql,(error,results,fields) => {
+            logger.trace('Mysql.query response error',error)
             if(error) {
                 reject(error);
                 return ;
@@ -105,6 +116,27 @@ export default class Mysql {
         }
     }
     /**
+     * 根据primary的值去获取某一个数据
+     * @param {number} primaryKeyValue 主键的值
+     * @return {object} 查询的数据
+     */
+    async one(primaryKeyValue) {
+        try {
+            const res = await this.query(
+                SQL.one(
+                    this.table,
+                    this.primaryKey,
+                    primaryKeyValue
+                )
+            )
+            logger.trace('Mysql.one',res.results[0])
+            return res.results[0]
+        } catch (error) {
+            logger.trace('Mysql.one error',error)
+            throw error
+        }
+    }
+    /**
      * 插入数据
      * @param {object} inserted 要插入表的数据 
      * @return {number} 插入数据的主键的值
@@ -116,6 +148,7 @@ export default class Mysql {
             )
             return res.results.insertId
         } catch(e) {
+            logger.trace('Mysql.insert',e)
             throw e;
         }
     }
