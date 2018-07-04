@@ -24,7 +24,25 @@ export default new class Business extends Mysql {
             business.bizKey = bizKey;
             return await this.insert(business);
         } catch(e) {
-            logger.trace('BusinessModel.add error',e);
+            throw e
+        }
+    }
+    /**
+     * 数据更新
+     * @param {number} primaryKeyValue 主键的值
+     * @param {object} updated 将要更新的数据
+     */
+    async modify(updated) {
+        try {
+            if (updated.bizKey) {
+                return Promise.reject()
+            }
+            return await this.update(
+                primaryKeyValue,
+                updated
+            );
+        } catch(e) {
+            logger.trace('BusinessModel.modify error',e)
             throw e
         }
     }

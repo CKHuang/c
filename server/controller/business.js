@@ -39,7 +39,7 @@ export default new Controller(`business`,{
     },
     async insert(ctx,data) {
         try {
-            const insertId = this.invokeModel(
+            const insertId = await this.invokeModel(
                 ctx,
                 'business',
                 'add',
@@ -47,6 +47,7 @@ export default new Controller(`business`,{
             )
             res.success(ctx,{insertId})
         } catch(error) {
+            logger.trace('catch error')
             res.fail(ctx,error.code || Code.SERVER_ERROR,error)
         }
     },
@@ -63,7 +64,7 @@ export default new Controller(`business`,{
 
     }
 }).on('error',(error) => {
-    logger.trace('BusinessController.error',error)
+    logger.trace('BusinessController.error',error.error)
     res.fail(
         error.ctx,
         code.SERVER_ERROR,

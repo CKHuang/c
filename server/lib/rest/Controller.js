@@ -72,11 +72,13 @@ export default class Controller extends EventEmitter {
                 )
                 return ;
             }
+            logger.trace(`before invokeModel ${name}.${method}`,res);
             const res = await model[method].call(model,...args)
-            logger.trace(`invokeModel ${name}.${method}`,res);
+            logger.trace(`after invokeModel ${name}.${method}`,res);
             return res
         } catch (error) {
             logger.trace('Controller.invokeModel error',error);
+            //throw error;
             this.handlerException(
                 EXCEPTION.INVOKEMODEL,
                 error,

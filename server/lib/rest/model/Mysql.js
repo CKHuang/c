@@ -62,8 +62,8 @@ const query = (connection,sql) => {
     return new Promise((resolve,reject) => {
         logger.trace('Mysql.query',sql);
         connection.query(sql,(error,results,fields) => {
-            logger.trace('Mysql.query response error',error)
             if(error) {
+                logger.trace('Mysql.query response error',error)
                 reject(error);
                 return ;
             }
