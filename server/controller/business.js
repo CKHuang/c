@@ -1,8 +1,17 @@
 import Controller from '../lib/rest/Controller'
+import businessModel from '../model/business'
 
 export default new Controller(`business`,{
     async one(ctx,{id}) {
-        ctx.body = `GET ${id} Business`
+        ctx.body = `GET ${zidk} Business`
+        
+        if (id == 'insert') {
+            businessModel.insert({
+                name: 'aps_TEST',
+                key: 'aps_keys',
+                owner: 'ckming'
+            })
+        }
     },
     async query(ctx) {
         ctx.body = 'Query business'
@@ -12,7 +21,7 @@ export default new Controller(`business`,{
     async delete(ctx) {}
 }).verify({
     async one(ctx,{id}) {
-        return Promise.reject('verify error');
+        return Promise.resolve('verify error');
     },
     async query(ctx,{}) {
 
