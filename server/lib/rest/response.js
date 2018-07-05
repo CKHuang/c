@@ -1,5 +1,4 @@
 import code from '../../config/code'
-import logger from '../logger';
 
 /**
  * 用作映射，为了解耦
@@ -16,9 +15,8 @@ export default {
      * @param {mixed} data 返回客户端的数据
      */
     success(ctx,data = null) {
-        logger.trace('response.success',data);
-        ctx.response.type = 'json';
-        ctx.response.body = JSON.stringify({
+        ctx.type = 'json';
+        ctx.body = JSON.stringify({
             code: Code.SUCCESS.code,
             data: data,
             message: Code.SUCCESS.message
@@ -31,12 +29,11 @@ export default {
      * @param {mixed} error 错误的具体的内容
      */
     fail(ctx,errorCode = code.UNKNOW,error = null) {
-        logger.trace('response.fail',errorCode)
-        ctx.response.type = 'json';
-        ctx.response.body = {
+        ctx.type = 'json';
+        ctx.body = JSON.stringify({
             code: errorCode.code || 999,
             message: errorCode.message || '未知错误',
             error: error
-        }
+        })
     }
 }

@@ -22,13 +22,16 @@ const now = () => {
 }
 
 var color = `[34m`;
-const write = (type,message) => {
-    color = color.indexOf('[34m') > -1 ? `[35m` : `[34m`
-    console.log(`\x1b${color}${now()} [${type}] ${message}\x1b${color}`) 
+const write = (type,message,ucolor = '') => {
+    if ( type == TYPE.TRACE ) {
+        color = color.indexOf('[34m') > -1 ? `[35m` : `[34m`
+        ucolor = color;
+    }
+    console.log(`\x1b${ucolor}${now()} [${type}] ${message}\x1b${ucolor}`) 
 }
 
-const error = (error) => {
-
+const error = (action,error = new Error()) => {
+    write(TYPE.ERROR,`[${action}][${error}]`,`[31m`)
 }
 
 const info = () => {

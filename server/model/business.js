@@ -1,7 +1,6 @@
 import Mysql from '../lib/rest/model/Mysql'
 import dbConfig from '../config/db'
 import crypto from 'crypto'
-import logger from '../lib/logger';
 
 export default new class Business extends Mysql {
     constructor(...args) {
@@ -22,6 +21,7 @@ export default new class Business extends Mysql {
                 Object.values(business).join('_')
             ).digest('hex')
             business.bizKey = bizKey;
+            business.process = JSON.stringify(business.process)
             return await this.insert(business);
         } catch(e) {
             throw e
@@ -42,7 +42,6 @@ export default new class Business extends Mysql {
                 updated
             );
         } catch(e) {
-            logger.trace('BusinessModel.modify error',e)
             throw e
         }
     }

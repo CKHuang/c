@@ -1,4 +1,6 @@
 import businessRoute from './business'
+import configRoute from './config'
+import uidRoute from './uid'
 
 /**
  * 路由注册
@@ -7,6 +9,10 @@ import businessRoute from './business'
 const route = (app) => {
     app.use(businessRoute.routes())
        .use(businessRoute.allowedMethods())
+    app.use(configRoute.routes())
+       .use(configRoute.allowedMethods())
+    app.use(uidRoute.routes())
+       .use(uidRoute.allowedMethods())
 }
 
 export default route

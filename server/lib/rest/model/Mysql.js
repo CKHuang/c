@@ -1,5 +1,7 @@
 import mysql from 'mysql'
 import logger from '../../logger'
+import { resolve } from 'path';
+import { rejects } from 'assert';
 
 
 /**
@@ -48,8 +50,7 @@ const SQL = {
  * @param {object} endpoint {host,password,user,databases}
  */
 const getConnection = (endpoint) => {
-    console.log('endpoint',endpoint)
-    return mysql.createPool(endpoint)
+    return mysql.createConnection(endpoint)
 }
 
 /**
@@ -58,20 +59,19 @@ const getConnection = (endpoint) => {
  * @param {string} sql 要执行的sql语句
  * @return {Promise}
  */
-const query = (connection,sql) => {
+const query = async (connection,sql) => {
     return new Promise((resolve,reject) => {
-        logger.trace('Mysql.query',sql);
         connection.query(sql,(error,results,fields) => {
-            if(error) {
-                logger.trace('Mysql.query response error',error)
-                reject(error);
+            if (error) {
+                logger.error(`mysql.query [${sql}]`,error)
+                reject(error)
                 return ;
             }
             resolve({
                 results,
                 fields
             })
-        }); 
+        });
     })
 }
 
@@ -146,9 +146,9 @@ export default class Mysql {
             const res = await this.query(
                 SQL.insert(this.table,inserted)
             )
+            logger.trace('insert success',res.results);
             return res.results.insertId
         } catch(e) {
-            logger.trace('Mysql.insert',e)
             throw e;
         }
     }

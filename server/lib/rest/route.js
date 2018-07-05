@@ -87,7 +87,7 @@ const parameter = {
      * @return {object} 
      */
     query(ctx) {
-        return {}
+        return ctx.query
     },
     /**
      * 获取query行为的参数
@@ -146,32 +146,37 @@ const route = (resource,fns = {}) => {
         ACTIONS_ARRAY
     )
     router
-        .get(url,(ctx) => {
-            funs.query(
+        .get(url,async (ctx,next) => {
+            await next();
+            await funs.query(
                 ctx,
                 parameter.query(ctx)
             )
         })
-        .get(`${url}/:id`,(ctx) => {
-            funs.one(
+        .get(`${url}/:id`,async (ctx,next) => {
+            await next();
+            await funs.one(
                 ctx,
                 parameter.one(ctx)
             )
         })
-        .post(url,(ctx) => {
-            funs.insert(
+        .post(url,async (ctx,next) => {
+            await next();
+            await funs.insert(
                 ctx,
                 parameter.insert(ctx)
             )
         })
-        .put(`${url}/:id`,(ctx) => {
-            funs.update(
+        .put(`${url}/:id`,async (ctx,next) => {
+            await next();
+            await funs.update(
                 ctx,
                 parameter.update(ctx)
             )
         })
-        .delete(`${url}/:id`,(ctx) => {
-            funs.delt(
+        .delete(`${url}/:id`,async (ctx,next) => {
+            await next();
+            await funs.delt(
                 ctx,
                 parameter(ACTIONS.DELETE,ctx)
             );
