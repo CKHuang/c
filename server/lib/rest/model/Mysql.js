@@ -91,6 +91,9 @@ export default class Mysql {
         this.formats = null
         return this;
     }
+    formatSQL(...args) {
+        return mysql.format(...args)
+    }
     /**
      * 字段格式化输出以及输入
      * @param {object} funs 函数对象 
@@ -118,7 +121,7 @@ export default class Mysql {
     /**
      * 根据primary的值去获取某一个数据
      * @param {number} primaryKeyValue 主键的值
-     * @return {object} 查询的数据
+     * @return {null/object} 查询的数据
      */
     async one(primaryKeyValue) {
         try {
@@ -130,7 +133,7 @@ export default class Mysql {
                 )
             )
             logger.trace('Mysql.one',res.results[0])
-            return res.results[0]
+            return res.results.length > 0 ? res.results[0] : null;
         } catch (error) {
             logger.trace('Mysql.one error',error)
             throw error

@@ -9,6 +9,80 @@ export default new class Business extends Mysql {
             `t_business`,
             `id`
         )
+        this.logic = {
+            /**
+             * 鉴权,group应该是要包含所有的人的
+             * @param {business} business 业务数据
+             * @param {string} user 用户的名称
+             * @return {boolean}
+             */
+            authentication(business,user) {
+                return ( business.group.indexOf(user) > -1 ||
+                         business.master.indexOf(user) > -1 ||
+                         business.owner.indexOf(user) ) ? true : false
+            },
+            /**
+             * 输出之前格式化business数据
+             * @param {business} business 业务数据
+             * @return {business}
+             */
+            format(business) {
+                business.process = JSON.parse(business.process)
+                business.group   = JSON.parse(business.group)
+                business.master  = JSON.parse(business.master)
+                return business;
+            }
+        }
+    }
+    async one(...args) {
+        const business = await super.one(...args);
+        if(business) {
+            this.logic.format(business);
+        }
+        return business;
+    }
+    /**
+     * 根据id以及key查询以及权鉴定
+     * @param {number} bid 
+     * @param {string} bizKey 
+     * @param {string} user
+     * @return {boolean/business} 有权限返回business，没有以及没有对应业务数据则返回false
+     */
+    async authentication(bid,bizKey,user) {
+        try {
+            const business = await this.queryOnIdAndKey(
+                bid,bizKey
+            )
+            if (!business) {
+                return false;
+            }
+            return this.logic.authentication(business,user) 
+                        ? business
+                        : false
+        } catch(error) {
+            throw error
+        }
+    }
+    /**
+     * 根据id以及key查询是否存在对应的业务
+     * @param {number} bid 
+     * @param {string} bizKey
+     * @return {null/business} 存储返回business数据，否则返回null
+     */
+    async queryOnIdAndKey(bid,bizKey) {
+        try {
+            const res = await this.query(
+                this.formatSQL(
+                    `SELECT * FROM ${this.table} WHERE id = ? AND bizKey = ?`,
+                    [bid,bizKey]
+                )
+            )
+            return res.results.length > 0 
+                    ? this.logic.format(res.results[0]) 
+                    : null;
+        } catch(error) {
+            throw error;
+        }
     }
     /**
      * 新增加一个业务

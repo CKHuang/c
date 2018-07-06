@@ -1,10 +1,15 @@
 import Koa from 'koa'
 import bodyParser from 'koa-bodyparser'
 import appConfig from './config/app'
-import routes from './routes/register'
+import routes from './routes'
 import error from './error'
+import auth from './middleware/auth'
 
 const app = new Koa()
+
+app.use(auth({
+    defaultUser: 'ck.ming'
+}))
 
 app.use(bodyParser())
 
