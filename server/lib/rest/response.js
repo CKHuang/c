@@ -15,6 +15,7 @@ export default {
      * @param {mixed} data 返回客户端的数据
      */
     success(ctx,data = null) {
+        console.log('->success',ctx.response.headerSent)
         ctx.type = 'json';
         ctx.body = JSON.stringify({
             code: Code.SUCCESS.code,
@@ -29,6 +30,7 @@ export default {
      * @param {mixed} error 错误的具体的内容
      */
     fail(ctx,errorCode = code.UNKNOW,error = null) {
+        console.log('->fail',ctx.response.headerSent,error)
         ctx.type = 'json';
         ctx.body = JSON.stringify({
             code: errorCode.code || 999,

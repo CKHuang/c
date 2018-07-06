@@ -42,6 +42,18 @@ const SQL = {
             `UPDATE ${table} SET ${fields.join(',')} WHERE ${primaryKey} = ?`,
             values
         )
+    },
+    /**
+     * 生成delete语句
+     * @param {string} table 
+     * @param {string} primaryKey 
+     * @param {number} primaryKeyValue 
+     */
+    delete(table,primaryKey,primaryKeyValue) {
+        return mysql.format(
+            `DELETE FROM ${table} WHERE ${primaryKey} = ?`,
+            primaryKeyValue
+        )
     }
 }
 
@@ -75,6 +87,41 @@ const query = async (connection,sql) => {
     })
 }
 
+/**
+ * 事物操作
+ * @param {Mysql.Connection} connection mysql的链接connection
+ * @param {array} sqls 要执行事物的mysql处理函数
+ */
+const transaction = async (connection,sqls) => {
+    return new Promise((resolve,reject) => {
+        connection.beginTransaction((error) => {
+            if (error) {
+                reject(error);
+                return ;
+            }
+            let runs = []
+            for ( let sql of sqls ) {
+                runs.push(query(connection,sql)) 
+            }
+            Promise.all(runs)
+                .then((res) => {
+                    connection.commit((error) => {
+                        if (error) {
+                            reject(error)
+                            return;
+                        }
+                        resolve(res)
+                    })
+                }).catch((error) => {
+                    connection.rollback(() => {
+                        reject(error)
+                    })
+                })
+            
+        })
+    });
+}
+
 export default class Mysql {
     /**
      * 构造函数
@@ -91,6 +138,7 @@ export default class Mysql {
         this.formats = null
         return this;
     }
+    
     formatSQL(...args) {
         return mysql.format(...args)
     }
@@ -101,6 +149,14 @@ export default class Mysql {
     format(funs) {
         this.formats = funs;
         return this;
+    }
+    /**
+     * 事物执行
+     * @param {array} sqls 要执行事物的sql语句数据
+     * @return {array}
+     */
+    async transaction(sqls) {
+        return await transaction(this.connection,sqls)
     }
     /**
      * 执行sql语句
@@ -172,6 +228,21 @@ export default class Mysql {
                 )
             )
             return res.results.affectedRows
+        } catch(e) {
+            throw e;
+        }
+    }
+    async delete(primaryKeyValue) {
+        try {
+            const res = await this.query(
+                SQL.delete(
+                    this.table,
+                    this.primaryKey,
+                    primaryKeyValue
+                )
+            )
+            console.log(res.results)
+            return res.results
         } catch(e) {
             throw e;
         }

@@ -13,7 +13,8 @@ export default new Controller(`application`,{
                 inserted,
                 user
             )
-            res.success(insertId)
+            console.log('--->insertId',insertId)
+            res.success(ctx,insertId)
         } catch(error) {
             res.fail(ctx,code.SERVER_ERROR,error);
         }
