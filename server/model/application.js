@@ -25,7 +25,45 @@ export default new class Application extends Mysql {
                 return md5.update(
                     [bizKey,process,config,Date.now()].join('_')
                 ).digest('hex')
+            },
+            /**
+             * 输出之前先格式化application数据
+             * @param {application} application 
+             */
+            format(application) {
+                application.process = JSON.parse(application.process)
+                return application;
             }
+        }
+    }
+    /**
+     * 根据申请审批单的id查询某个用户对此是什么权限
+     * @param {number} id 
+     * @param {string} user
+     * @return {number} 0 没有任何权限
+     */
+    async authentication(id,user) {
+        try {
+             
+        } catch(error) {
+            throw error
+        }
+    }
+    /**
+     * 获取单个申请审批单的信息
+     * @param {number} id 申请审批单的id
+     */
+    async one(id) {
+        try {
+            const res = await this.query(
+                `SELECT * FROM ${this.table},${this.table_config},${this.table_process} \
+                 WHERE id = ${id} `
+            )
+            return res.results.length > 0
+                    ? this.logic.format(res.results[0])
+                    : null
+        } catch (error) {
+            throw error;
         }
     }
     /**
