@@ -1,6 +1,6 @@
 import Controller from '../lib/rest/Controller'
 import res from '../lib/rest/response'
-import apsConfig from '../config/aps'
+import apsConfig from '../../config/aps'
 import code from '../config/code'
 
 const Types = ['process','approver','rule'];

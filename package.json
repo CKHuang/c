@@ -5,10 +5,11 @@
   "main": "index.js",
   "scripts": {
     "init": "./node_modules/.bin/webpack --progress --config webpack.dev.config.js",
-    "dev": "./node_modules/.bin/webpack-dev-server --content-base ./ --open --inline --hot --compress --history-api-fallback --config webpack.dev.config.js & ./node_modules/.bin/hotnode ./server/es6.js",
+    "dev:client": "./node_modules/.bin/webpack-dev-server --content-base ./ --open --inline --hot --compress --history-api-fallback --config webpack.dev.config.js",
     "build": "./node_modules/.bin/webpack --progress --hide-modules --config webpack.prod.config.js",
     "lint": "./node_modules/.bin/eslint --fix --ext .js,.vue src",
-    "dev:server": "./node_modules/.bin/hotnode ./server/es6"
+    "dev:server": "./node_modules/.bin/hotnode ./server/es6",
+    "dev": "npm run dev:client & npm run dev:server"
   },
   "repository": {
     "type": "git",

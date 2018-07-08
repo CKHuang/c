@@ -17,16 +17,16 @@ const routers = [{
     },
     component: (resolve) => require(['./views/business/list.vue'], resolve)
 },{
-    path: '/apply/form',
+    path: '/application/form',
     meta: {
         title: '申请单表单'
     },
-    component: (resolve) => require(['./views/apply/form.vue'], resolve)
+    component: (resolve) => require(['./views/application/form.vue'], resolve)
 },{
-    path: '/apply/list',
+    path: '/application/list',
     meta: {
         title: '申请单列表'
     },
-    component: (resolve) => require(['./views/apply/list.vue'], resolve)
+    component: (resolve) => require(['./views/application/list.vue'], resolve)
 }];
 export default routers;
