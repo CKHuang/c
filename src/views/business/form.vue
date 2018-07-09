@@ -12,9 +12,17 @@
                 <CheckboxGroup v-model="form.process">
                     <Checkbox v-for="item in process" v-bind:label="item.label" v-bind:key="item.pid"></Checkbox>
                 </CheckboxGroup>
-                <Select v-model="form.approver">
-                    <Option v-for="item in approver" v-bind:key="item.aid" v-bind:value="item.aid">item.label</Option>
-                </Select>
+            </FormItem>
+            <FormItem label="审批人配置">
+                <ApproverInput v-model="form.approver">
+                </ApproverInput>
+            </FormItem>
+            <FormItem label="审批通过规则">
+                <RuleInput v-model="form.rule">
+                </RuleInput>
+            </FormItem>
+            <FormItem>
+                <Button type="primary" @click="handlerSubmit">提交</Button>
             </FormItem>
             <!-- <FormItem label="Master">
                 <Input v-model="form.master_json" placeholder="业务的master成员具有高级审批审批权限，最多指定3个master，每个以;分割"></Input>
@@ -24,23 +32,30 @@
 </template>
 <script>
     import apsConfig from '../../../config/aps'
-    console.log(apsConfig.process())
+    import ApproverInput from '../common/form/ApproverInput.vue'
+    import RuleInput from '../common/form/RuleInput.vue'
+
     export default {
+        components: {
+            ApproverInput: ApproverInput,
+            RuleInput: RuleInput
+        },
         data () {
             return {
                 form: {
                     key: '',
                     name: '',
-                    master_json: ['zhangsan','lisi'].join(';')
+                    master_json: ['zhangsan','lisi'].join(';'),
+                    approver: {id:3,approvers:`CKHuang;Ck.Ming;HelloCk`},
+                    rule: {id:2,coverage:45}
                 },
-                process: apsConfig.process(),
-                approver: apsConfig.approver(),
-                rule: apsConfig.rule()
+                process: apsConfig.process()
             }
         },
         methods: {
             handlerSubmit() {
-
+                //this.form.approver.id = 2;
+                console.log(this.form.approver,this.form.rule)
             }
         }
     }
