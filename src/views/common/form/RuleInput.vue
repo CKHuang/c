@@ -1,8 +1,16 @@
+<style scoped>
+    .input-card {
+        background-color: #efefef;
+        border: 1px #c3c3c3 dashed;
+    }
+</style>
+
 <template>
     <div>
         <RadioGroup
             :value="currentValue"
             @on-change="change"
+            
         >
             <Radio
                 v-for="config in configs"
@@ -12,15 +20,30 @@
         </RadioGroup>
         <Card
             dis-hover
-            v-if="inputState"
+            v-if="currentValue == 2"
+            :padding="10"
+            class="input-card"
         >
-            <InputNumber
-                :max="100"
-                :min="30"
-                :formatter="value => `${value}%`"
-                :parser="value => value.replace('%', '')"
-                v-model="coverage"
-            ></InputNumber>
+            <Form :label-width="100" label-position="right">
+                <FormItem label="QQ号码覆盖率">
+                    <InputNumber
+                        :max="100"
+                        :min="30"
+                        :formatter="value => `${value}%`"
+                        :parser="value => value.replace('%', '')"
+                        v-model="coverage.rate"
+                        @on-change="input"
+                    ></InputNumber>
+                </FormItem>
+                <FormItem label="检测的QQ号码" style="margin-top:8px;">
+                    <Input
+                        v-model="coverage.uids"
+                        @on-change="input"
+                    >
+                    </Input>
+                </FormItem>
+            </Form>
+            
         </Card>
     </div>
 </template>
@@ -40,7 +63,9 @@
      *      @prop
      *          @param {Object} value
      *          @param {Number} value.id 选中的id
-     *          @param {Number} value.coverage 覆盖率，针对类型是2才有用，默认是0
+     *          @param {Object} value.coverage 覆盖率配置,针对id是2才有效
+     *          @param {Number} value.coverage.rate 覆盖比例
+     *          @param {String}  value.coverage.uids 需要覆盖的用户号，多个以;分割
      *      @event
      *          @on-change(currentValue) currentValue
      */
@@ -56,7 +81,7 @@
                 type: Object,
                 default: () => ({
                     id: 0,
-                    coverage: 0
+                    coverage: {rate:0,uids:``}
                 })
             }
         },
@@ -64,18 +89,10 @@
             return {
                 currentValue: this.value.id,
                 coverage: this.value.coverage || 0,
-                inputState: this.updateInputState(),
                 configs: apsConfig.rule()
             }
         },
         methods: {
-            updateInputState() {
-                const config = apsConfig.getRule(
-                    this.value.id
-                )
-                this.inputState = config.iview.needInput;
-                return this.inputState;
-            },
             change(currentValue) {
                 this.currentValue = currentValue;
                 const model = this.model(this.currentValue)
@@ -84,6 +101,7 @@
             },
             input() {
                 this.$emit('input',this.model())
+                this.$emit('on-change',this.model())
             },
             model(currentValue) {
                 const _checkId = currentValue || this.currentValue;
@@ -93,7 +111,7 @@
                 const has = config.iview.needInput;
                 return {
                     id: _checkId,
-                    coverage: has ? this.coverage : 0
+                    coverage: has ? this.coverage : {rate:0,uids:``}
                 }
             }
         },
@@ -102,7 +120,6 @@
                 if ( this.currentValue !== this.value.id ) {
                     this.currentValue = this.value.id
                 }
-                this.updateInputState();
             }
         }
     }

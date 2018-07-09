@@ -1,7 +1,14 @@
+<style scoped>
+    .input-card {
+        background-color: #efefef;
+        border: 1px #c3c3c3 dashed;
+    }
+</style>
+
 <template>
     <div>
         <RadioGroup 
-            :value="currentValue" 
+            :value="currentValue"
             @on-change="change"
         >
             <Radio 
@@ -12,13 +19,20 @@
         </RadioGroup>
         <Card 
             dis-hover
-            v-if="inputState"    
+            v-if="currentValue == 3"
+            :padding="10"
+            class="input-card"
         >
-            <Input
-                placeholder="最多填写3个审批人，多个审批人用;符号分割"
-                v-model="approvers"
-                @on-change="input"
-            ></Input>
+            <Form :label-width="90" label-position="right">
+                <FormItem label="自定义审批人">
+                    <Input
+                        placeholder="最多填写3个审批人，多个审批人用;符号分割"
+                        v-model="approvers"
+                        @on-change="input"
+                    ></Input>
+                </FormItem>
+            </Form>
+            
         </Card>
     </div>
 </template>
@@ -65,18 +79,10 @@
             return {
                 currentValue: this.value.id,
                 approvers: this.value.approvers || ``,
-                inputState: this.updateInputState(),
                 configs: apsConfig.approver()
             }
         },
         methods: {
-            updateInputState() {
-                const config = apsConfig.getApprover(
-                    this.value.id
-                )
-                this.inputState = config.iview.needInput;
-                return this.inputState;
-            },
             change(currentValue) {
                 this.currentValue = currentValue;
                 const model = this.model(this.currentValue)
@@ -85,6 +91,7 @@
             },
             input() {
                 this.$emit('input',this.model())
+                this.$emit('on-change',this.model())
             },
             model(currentValue) {
                 const _checkId = currentValue || this.currentValue;
@@ -103,7 +110,6 @@
                 if ( this.currentValue !== this.value.id ) {
                     this.currentValue = this.value.id;
                 }
-                this.updateInputState();
             }
         }
     }
