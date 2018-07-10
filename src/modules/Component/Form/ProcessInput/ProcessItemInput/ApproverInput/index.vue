@@ -38,7 +38,7 @@
 </template>
 
 <script>
-    import apsConfig from '../../../../config/aps'
+    import apsConfig from '../../../../../../../config/aps'
     import Emitter from 'iview/src/mixins/emitter'
 
     /**

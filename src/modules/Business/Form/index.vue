@@ -9,41 +9,20 @@
                 <Input v-model="form.name" placeholder="给您的业务起个名字吧，例如：QQWALLET_COUPON"></Input>
             </FormItem>
             <FormItem label="审批流程">
-                <!-- <CheckboxGroup v-model="form.process">
-                    <Checkbox v-for="item in process" v-bind:label="item.label" v-bind:key="item.pid"></Checkbox>
-                </CheckboxGroup> -->
                 <ProcessInput
                     v-model="form.process"
                 >
                 </ProcessInput>
             </FormItem>
-            <!-- <FormItem label="审批人配置">
-                <ApproverInput v-model="form.approver">
-                </ApproverInput>
-            </FormItem>
-            <FormItem label="审批通过规则">
-                <RuleInput v-model="form.rule">
-                </RuleInput>
-            </FormItem>
-            <FormItem>
-                <Button type="primary" @click="handlerSubmit">提交</Button>
-            </FormItem> -->
-            <!-- <FormItem label="Master">
-                <Input v-model="form.master_json" placeholder="业务的master成员具有高级审批审批权限，最多指定3个master，每个以;分割"></Input>
-            </FormItem> -->
         </Form>
     </Card>
 </template>
 <script>
-    import apsConfig from '../../../config/aps'
-    import ApproverInput from '../common/form/ApproverInput.vue'
-    import RuleInput from '../common/form/RuleInput.vue'
-    import ProcessInput from '../common/form/ProcessInput.vue'
+    import apsConfig from '../../../../config/aps'
+    import ProcessInput from '../../Component/Form/ProcessInput/index.vue'
 
     export default {
         components: {
-            ApproverInput: ApproverInput,
-            RuleInput: RuleInput,
             ProcessInput: ProcessInput
         },
         data () {
@@ -53,12 +32,15 @@
                     name: '',
                     master_json: ['zhangsan','lisi'].join(';'),
                     process: [{
+                        process: {id:1,label:`自测`},
                         approver: {id:3,approvers:`CKHuang;Ck.Ming;HelloCk`},
                         rule: {id:2,coverage:{rate:42,uids:'72732;232123;3232;123;323223'}}
                     },{
+                        process: {id:2,label:`体验`},
                         approver: {id:3,approvers:`CKHuang;Ck.Ming;HelloCk`},
                         rule: {id:2,coverage:{rate:42,uids:'72732;232123;3232;123;323223'}}
                     },{
+                        process: {id:3,label:`测试`},
                         approver: {id:3,approvers:`CKHuang;Ck.Ming;HelloCk`},
                         rule: {id:2,coverage:{rate:42,uids:'72732;232123;3232;123;323223'}}
                     }]
