@@ -1,10 +1,10 @@
 <style scoped>
     .name {
         padding: 15px;
-        background: #f5f5f5;
+        
     }
     .tab-content {
-        padding: 0px 15px;
+        
     }
     .pull-right {
         float: right;;
