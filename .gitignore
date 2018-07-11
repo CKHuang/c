@@ -10,3 +10,4 @@ src/config/env.js
 npm-debug.log
 server/config/*
 config/*
+README.md
