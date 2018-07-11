@@ -34,7 +34,7 @@ module.exports = merge(webpackBaseConfig, {
     ],
     devServer: {
         headers: {
-            'Cookies': `sessionKey=webpacdevsessionKey;sessionToken=webpackdevsessionToke;uid=webpackdev`
+            'Cookie': `sessionKey=webpacdevsessionKey; PATH=/;`
         }
     }
 });

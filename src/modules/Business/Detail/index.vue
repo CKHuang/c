@@ -34,6 +34,7 @@
 <script>
     import util from '../../../libs/util'
     import ApplicationList from '../../Application/List/index.vue'
+    import { mapState } from 'Vuex'
 
     /**
      * @name BusinessDetail
@@ -59,6 +60,9 @@
                 type: String,
                 default: `application`
             }
+        },
+        computed: {
+            ...mapState
         },
         methods: {
 

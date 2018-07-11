@@ -5,6 +5,7 @@ import Routers from './router/index';
 import Vuex from 'vuex';
 import Util from './libs/util';
 import App from './App.vue';
+import store from './store'
 import './styles/iview/iview.css'
 import './styles/common.css'
 
@@ -34,23 +35,6 @@ router.afterEach((to, from) => {
     window.scrollTo(0, 0);
     Routers.afterEach(to, from)
 });
-
-
-const store = new Vuex.Store({
-    state: {
-
-    },
-    getters: {
-
-    },
-    mutations: {
-
-    },
-    actions: {
-
-    }
-});
-
 
 new Vue({
     el: '#app',
