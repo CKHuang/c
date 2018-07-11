@@ -18,11 +18,13 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "apples": "^1.0.4",
     "async-mysql": "^1.0.1",
     "axios": "^0.15.3",
     "clipboard": "^1.5.12",
     "echarts": "^3.4.0",
     "iview": "^2.7.4",
+    "js-cookie": "^2.2.0",
     "koa": "^2.5.1",
     "koa-bodyparser": "^4.2.1",
     "koa-router": "^7.4.0",

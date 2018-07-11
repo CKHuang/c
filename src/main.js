@@ -19,19 +19,20 @@ Vue.use(iView);
 // 路由配置
 const RouterConfig = {
     mode: 'history',
-    routes: Routers
+    routes: Routers.routes
 };
 const router = new VueRouter(RouterConfig);
 
 router.beforeEach((to, from, next) => {
     iView.LoadingBar.start();
     Util.title(to.meta.title);
-    next();
+    Routers.beforeEach(to,from,next)
 });
 
-router.afterEach(() => {
+router.afterEach((to, from) => {
     iView.LoadingBar.finish();
     window.scrollTo(0, 0);
+    Routers.afterEach(to, from)
 });
 
 

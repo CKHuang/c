@@ -14,6 +14,9 @@
     margin: 0 auto;
     margin-right: 20px;
 }
+.alink {
+    color: hsla(0,0%,100%,.7);
+}
 </style>
 
 <template>
@@ -24,12 +27,16 @@
             </div>
             <div class="layout-nav">
                 <MenuItem name="1">
-                    <Icon type="speedometer"></Icon>
-                    控制台
+                    <router-link :to="{ name: 'layout'}" class="alink">
+                        <Icon type="speedometer"></Icon>
+                        控制台
+                    </router-link>
                 </MenuItem>
                 <MenuItem name="2">
-                    <Icon type="android-list"></Icon>
-                    业务列表
+                    <router-link :to="{ name: 'business-list'}" class="alink">
+                        <Icon type="android-list"></Icon>
+                        业务列表
+                    </router-link>
                 </MenuItem>
             </div>
         </Menu>

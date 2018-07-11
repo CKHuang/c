@@ -31,5 +31,10 @@ module.exports = merge(webpackBaseConfig, {
             template: './src/template/index.ejs',
             inject: false
         })
-    ]
+    ],
+    devServer: {
+        headers: {
+            'Cookies': `sessionKey=webpacdevsessionKey;sessionToken=webpackdevsessionToke;uid=webpackdev`
+        }
+    }
 });
