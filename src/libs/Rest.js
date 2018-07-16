@@ -22,22 +22,33 @@ const request = (
         responseType: 'json'
     }
 ) => {
-    return axios({
-        method: method,
-        url: url,
-        headers: opts.headers,
-        params: opts.params,
-        data: opts.data,
-        timeout: opts.timeout,
-        responseType: opts.responseType
-    })
+    return new Promise((resolve,reject) => {
+        axios({
+            method: method,
+            url: url,
+            headers: opts.headers,
+            params: opts.params,
+            data: opts.data,
+            timeout: opts.timeout,
+            responseType: opts.responseType
+        }).then((response) => {
+            const body = response.data;
+            if (body.code == 0) {
+                resolve(body.data);
+            } else {
+                reject(body);
+            }
+        }).catch((error) => {
+            reject(error);
+        })
+    });
 }
 
 const parserURL = (baseURL,resource) => {
     return `${baseURL}${resource}`
 }
 
-export default class Rest {
+export default class REST {
 
     /**
      * Rest以资源为单位拼接url发送请求
@@ -76,12 +87,7 @@ export default class Rest {
     one(id) {
         return this.request(
             `GET`,
-            `${parserURL(this.baseURL,this.resource)}/:id`,
-            {
-                params: {
-                    id: id
-                }
-            }
+            `${parserURL(this.baseURL,this.resource)}/${id}`
         )
     }
 }

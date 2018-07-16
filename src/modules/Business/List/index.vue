@@ -32,41 +32,35 @@
 </template>
 <script>
 
+    import { mapGetters, mapActions } from 'vuex'
+
     /**
      * @name BusinessList
      * @description 业务列表模块
      * @example
-     *     <BusinessList
-     *          v-model="[business,...]"
-     *          v-bind:loading="false"
-     *      >
+     *     <BusinessList>
      *     </BusinessList>
      */
     export default {
         name: `BusinessList`,
-        props: {
-            loading: {
-                type: Boolean,
-                default: false
-            },
-            value: {
-                type: [Array,Boolean],
-                default: false
-            }
+        props: {},
+        created() {
+            this.$store.dispatch('business/list')
+        },
+        computed: {
+            ...mapGetters(`business`,{
+                list: 'list'
+            })
         },
         methods: {
-            handler() {
-
-            }
+            ...mapActions(`business`,[
+                'list'
+            ]),
         },
         data() {
             return {
+                bid: this.id,
                 list: this.value
-            }
-        },
-        watch: {
-            value: (val) => {
-                this.loading = false;
             }
         }
     }

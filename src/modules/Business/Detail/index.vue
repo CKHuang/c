@@ -13,7 +13,7 @@
 
 <template>
     <div>
-        <h2 class="name">{{ detail.name }}
+        <h2 class="name">{{ business && business.name }}
             <Button icon="gear-a" size="small" type="primary" class="pull-right">设置</Button>
         </h2>
         <Tabs v-bind:value="currentTab">
@@ -32,9 +32,8 @@
 </template>
 
 <script>
-    import util from '../../../libs/util'
     import ApplicationList from '../../Application/List/index.vue'
-    import { mapState } from 'Vuex'
+    import { mapGetters, mapActions } from 'vuex'
 
     /**
      * @name BusinessDetail
@@ -51,6 +50,11 @@
         components: {
             ApplicationList: ApplicationList
         },
+        // 创建之后再去获取数据来渲染
+        created() {
+            this.$store.dispatch('business/one',{id:this.bid})
+        },
+        
         props: {
             id: {
                 type: Number,
@@ -62,10 +66,14 @@
             }
         },
         computed: {
-            ...mapState
+            ...mapGetters(`business`,{
+                business: 'one'
+            })
         },
         methods: {
-
+            ...mapActions(`business`,[
+                'one'
+            ]),
         },
         data() {
             return {

@@ -2,7 +2,6 @@ import Vue from 'vue';
 import iView from 'iview';
 import VueRouter from 'vue-router';
 import Routers from './router/index';
-import Vuex from 'vuex';
 import Util from './libs/util';
 import App from './App.vue';
 import store from './store'
@@ -11,7 +10,6 @@ import './styles/common.css'
 
 
 Vue.use(VueRouter);
-Vue.use(Vuex);
 
 Vue.use(iView);
 

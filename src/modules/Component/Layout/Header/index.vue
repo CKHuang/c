@@ -26,12 +26,12 @@
                 APS
             </div>
             <div class="layout-nav">
-                <MenuItem name="1">
+                <!-- <MenuItem name="1">
                     <router-link :to="{ name: 'layout'}" class="alink">
                         <Icon type="speedometer"></Icon>
                         控制台
                     </router-link>
-                </MenuItem>
+                </MenuItem> -->
                 <MenuItem name="2">
                     <router-link :to="{ name: 'business-list'}" class="alink">
                         <Icon type="android-list"></Icon>

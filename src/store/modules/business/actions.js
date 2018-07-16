@@ -3,8 +3,13 @@ import model from '../../../models/business'
 export default {
 
     one({commit},{id}) {
-        return model.one(id).then((business) => {
-            console.log(`business`,business)
-        })
+        model.one(id)
+            .then((business) => {
+                commit('append',{business})
+            }).catch((error) => {})
+    },
+
+    list({commit}) {
+        
     }
 }

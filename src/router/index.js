@@ -26,7 +26,6 @@ export default {
         ]
     }],
     beforeEach: (to, from, next) => {
-        console.log('->requiresAuth',to.matched);
         if (to.matched.some(record => record.meta.requiresAuth)) {
             if (!auth.loggedIn()) {
                 next();
